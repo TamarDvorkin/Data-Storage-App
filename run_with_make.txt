@@ -1,0 +1,24 @@
+hello! this text file target is to help future me/others
+to understand how to run the "beesnas" project
+
+make file:
+the make file creates dynamic library(so) to run all the files as a library,
+make sure to have all the directories + make sure the file name you want to run is at the "NAME = YOURFILENAME"
+
+How to run the refw- 
+run with pnp:
+
+sudo modprobe nbd
+
+sudo ./bin/debug/BeesNas  /dev/nbd1
+
+then move a .so file to your plugins directory
+
+end the program the right way:
+use "q" in your keyboard
+
+
+
+
+
+
