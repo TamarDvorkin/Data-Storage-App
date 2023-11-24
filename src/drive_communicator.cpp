@@ -25,9 +25,7 @@ namespace hrd29
     void WrapperThread (size_t size, int nbd_fd, int socket, Logger* logger1);
     
 
-    /***********************IDriverCommunicator***********************/
-    
-
+   
     /*********************NBDDriverCommunicator*********************/
     /*
     These helper functions were taken from cliserv.h in the nbd distribution.
