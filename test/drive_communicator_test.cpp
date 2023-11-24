@@ -21,7 +21,7 @@ void InitSignals(Logger* logger1);
 void WrapperDisconnectNbd(int sig_num);
 /****************************************/
 
-/*runing nbd locally(manually- would be in scripts)
+/*runing nbd locally
 first terminal
 modprobe nbd
 sudo ./a.out
@@ -36,13 +36,12 @@ nano text.txt
 
 */
 
-int stop_flag = 1; //TODO: atomic
+int stop_flag = 1;
 
 
 int main(void)
 {
-    //NBDDriverCommunicator* nbd = new NBDDriverCommunicator("/dev/ram0", 128000000);
-    //ptr_nbd = NBDDriverCommunicator("/dev/ram0", 128000000);
+    
 
 
     RAMStorage ramStorage(g_diskSize);
@@ -92,14 +91,14 @@ int main(void)
             ptr_nbd->logger1->Write( hrd29::Logger::Error,__FILE__, __LINE__, __func__, "main master- Failed to add STDIN to epoll", true );
         }   
 
-        while(1)// i change the flag latter
+        while(1)
         {
             num_waiting_events = epoll_wait(epoll_fd, events, 2, -1);
             if(-1 == num_waiting_events)
             {
-                if(stop_flag == 0)//after flag changed
+                if(stop_flag == 0)
                 {
-                    ptr_nbd->Disconnect();//NBD_DISCONNECT
+                    ptr_nbd->Disconnect();
                 }
                 throw MyException("Failed in epoll_wait() function");
                 ptr_nbd->logger1->Write( hrd29::Logger::Error,__FILE__, __LINE__, __func__, "main master- Failed in epoll_wait()", true );
@@ -110,7 +109,7 @@ int main(void)
                 if(STDIN_FILENO == events[i].data.fd)
                 {
                     fgets(input_buffer, g_max_input_size, stdin);
-                    input_buffer[strcspn(input_buffer, "\n")] = '\0'; /* Remove newline character */
+                    input_buffer[strcspn(input_buffer, "\n")] = '\0'; 
 
                     if (0 == strcmp(input_buffer, "quit")) 
                     {
@@ -128,17 +127,15 @@ int main(void)
                     {
                         case DriverData::READ:
                             ramStorage.Read(data);
-                            // printf("case DriverData::READ\n");
                             break;
 
                         case DriverData::WRITE:
                             ramStorage.Write(data);
-                            // printf("case DriverData::WRITE\n");
                             break;
 
                         // Handle other actions (FLUSH, TRIM) if needed.
 
-                        default:    // Handle unsupported actions or errors.
+                        default:    
                             printf("default\n");
                             break;
                     }
@@ -155,13 +152,13 @@ int main(void)
     {
         std::cout << "Gotta Catch 'em All" <<std::endl;
          ptr_nbd->logger1->Write( hrd29::Logger::Error,__FILE__, __LINE__, __func__, ex.what(), true );
-        //std::cerr << "Caught MyException: " << ex.what() << std::endl;//redundency
+        /
     }
 
     catch (...)  // unexpected exceptions-default catch
     {
          ptr_nbd->logger1->Write( hrd29::Logger::Error,__FILE__, __LINE__, __func__, "Caught unknown exception", true );
-        //std::cerr << "Caught unknown exception" << std::endl;
+        
     }
 
         
@@ -173,7 +170,7 @@ int main(void)
 void InitSignals(Logger* logger1)
 {
     struct sigaction sa_act;
-    sa_act.sa_flags = SA_SIGINFO;    //SA_RESTART;
+    sa_act.sa_flags = SA_SIGINFO;   
     sa_act.sa_handler = &WrapperDisconnectNbd;    //   disconnect_nbd;  
     if (sigemptyset(&sa_act.sa_mask) != 0 || sigaddset(&sa_act.sa_mask, SIGINT) != 0 ||sigaddset(&sa_act.sa_mask, SIGTERM) != 0) 
     {
@@ -192,9 +189,7 @@ void InitSignals(Logger* logger1)
 void WrapperDisconnectNbd(int sig_num)
 {
     (void) sig_num;
-
-    //ptr_nbd->Disconnect();// DO NOT CALL FUNCTION IN SIGANL HANDLER!
-    //change flag instead
+    //change flag 
     stop_flag = 0;
 }
 

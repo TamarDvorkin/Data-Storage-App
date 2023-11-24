@@ -24,12 +24,7 @@ namespace hrd29
     int WriteAll(int fd, char* buf, size_t count);
     void WrapperThread (size_t size, int nbd_fd, int socket, Logger* logger1);
     
-
-   
-    /*********************NBDDriverCommunicator*********************/
-    /*
-    These helper functions were taken from cliserv.h in the nbd distribution.
-    */
+    
     #ifdef WORDS_BIGENDIAN
     u_int64_t ntohll(u_int64_t a) {
     return a;
@@ -49,10 +44,10 @@ namespace hrd29
 
     NBDDriverCommunicator::NBDDriverCommunicator(const std::string &device_path, size_t nbd_size)
     {
-        // size = nbd_size;
+        
         logger1= Singleton<Logger>::GetInstance();
         puts("enter Ctor NBD\n");
-        /***** SOCKETS ******/
+       
         int sock_pair[2]; /* sock_pair[0] is the NBD driver socket and sock_pair[1] is the socket we can use for communication. */
         if(-1 ==  socketpair(AF_UNIX, SOCK_STREAM, 0, sock_pair) )
         {
@@ -63,7 +58,7 @@ namespace hrd29
 
         m_socket_fd = sock_pair[0]; 
 
-        /****** NBD protocol ******/
+        
         int nbd_fd = open(device_path.c_str(), O_RDWR);
         if(-1 == nbd_fd)
         {
@@ -130,7 +125,7 @@ namespace hrd29
         else
         {
             #if defined NBD_SET_FLAGS
-            int flags = 1; // Changed from 0
+            int flags = 1; 
             // #if defined NBD_FLAG_SEND_TRIM
             // flags |= NBD_FLAG_SEND_TRIM;
             // #endif
@@ -145,7 +140,7 @@ namespace hrd29
             }
             #endif
 
-            // if (BUSE_DEBUG) std::cerr << "nbd device terminated with code " << err << std::endl;
+            
             std::cout << "before NBD_DO_IT" << std::endl;            
             if (-1 == ioctl(nbd_fd, NBD_DO_IT))
             {
@@ -179,7 +174,7 @@ namespace hrd29
 
     std::shared_ptr<DriverData> NBDDriverCommunicator::ReceiveRequest()
     {
-        //puts("  enter ReceiveRequest\n");
+        
         struct nbd_request request;
         u_int32_t len;
         ssize_t bytes_read = sizeof(request);
@@ -205,14 +200,14 @@ namespace hrd29
         
         logger1->Write( hrd29::Logger::Error,__FILE__, __LINE__, __func__, "driver communicator- failed to read - ReceiveRequest function", true );
         throw MyException("failed to read - ReceiveRequest function\n");
-        //puts("  finish ReceiveRequest\n");
+        
         logger1->Write( hrd29::Logger::Info,__FILE__, __LINE__, __func__, "finish ReceiveRequest", true );
     }
 
 
     void NBDDriverCommunicator::SendReply(std::shared_ptr<DriverData> data_)
     {
-        //puts("  enter SendReply\n");
+        
         
         struct nbd_reply reply;
 
@@ -225,7 +220,7 @@ namespace hrd29
         {    
             WriteAll(m_socket_fd, data_->m_buffer.data(), data_->m_buffer.size());
         }
-        //puts("  finish SendReply\n");
+        
         logger1->Write( hrd29::Logger::Info,__FILE__, __LINE__, __func__, "finish SendReply", true );
     }
 
@@ -259,7 +254,7 @@ namespace hrd29
         return m_socket_fd;
     }
 
-/********************************************************************************/
+/******************************Read/Write all**************************************************/
 
     int ReadAll(int fd, char* buf, size_t count)
     {

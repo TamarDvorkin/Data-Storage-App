@@ -1,10 +1,4 @@
-/*******************************************************************************
- * Author: hrd29
- * Description: Header file for BeezNAS Driver Data
- * Date: 03.08.23
- * Reviewer: 
- * Versions: 1.0 
-*******************************************************************************/
+
 #ifndef _HRD29_BeezNAS_Data
 #define _HRD29_BeezNAS_Data
 
@@ -35,7 +29,6 @@ struct DriverData
     size_t m_len;    /* size of buffer */
     std::vector<char> m_buffer;
 
-    /*static size_t s_handle;  it is for the unique id for each request */
 };
 }//namespace hrd29
 

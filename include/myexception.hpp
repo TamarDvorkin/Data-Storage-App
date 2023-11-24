@@ -1,10 +1,4 @@
-/*******************************************************************************
- * Author: hrd29
- * Description: Header file for BeezNAS
- * Date: 03.08.23
- * Reviewer: 
- * Versions: 1.0 
-*******************************************************************************/
+
 #ifndef _HRD29_BeezNAS_MyException
 #define _HRD29_BeezNAS_MyException
 

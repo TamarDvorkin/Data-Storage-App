@@ -1,12 +1,5 @@
 
-/*******************************************************************************
- * Author:          HRD29
- * Description:     Header file for framework
- * Date:            22.08.23
- * Reviewer:        ---
- * Versions:        1.0 
-*******************************************************************************/
-//#pragma once
+
 #ifndef _HRD29_Request_Task_
 #define _HRD29_Request_Task_
 
@@ -14,7 +7,6 @@
 #include <unistd.h> // STDIN_FILENO
 #include <cstring>  // strcmp
 #include <cerrno>
-//#include <iostream>
 
 #include "interface_thread_task.hpp"
 #include "driver_data.hpp"
@@ -23,10 +15,6 @@
 #include "logger.hpp"
 
 
-/*
-#ifndef _HRD29_REFW__
-#define _HRD29_REFW__
-*/
 namespace hrd29
 {
 
@@ -46,19 +34,14 @@ struct MutexWrap
 
 struct ReadWriteTask
 {
-    //storage
-    //driver_data
-    //driver_communicator
-
-    //default ctor:
+  
     ReadWriteTask() = default;
-    // ReadWriteTask instaed of FW_args
+    
     ReadWriteTask(const std::shared_ptr<IDriverCommunicator> driver_communicator,
             const std::shared_ptr<IStorage> ram_storage,
             std::shared_ptr<DriverData> driver_data,
             std::shared_ptr<MutexWrap> mutex_wrap);
-    //CHECK:
-    //maybe should change to the object itself and not the reference
+    
     std::shared_ptr<IDriverCommunicator> m_driver_communicator;
     std::shared_ptr<IStorage> m_ram_storage;
     std::shared_ptr<DriverData> m_driver_data;
@@ -87,8 +70,7 @@ public:
     virtual ~RETask() noexcept = 0 ;
     RETask(const RETask& other_) = delete;
     RETask& operator=(const RETask& other_) = delete;
-    virtual void Execute()= 0;// impl in test
-    //Execute- for the user to understand- you need to give me Execute function
+    virtual void Execute()= 0;// user need to give me Execute function
 private:
 };
 //ITask - father, RETask - child , ReadTask - grandchild
@@ -200,16 +182,6 @@ RETask::~RETask() noexcept
 
 
 /*************************************ReadTask IMP****************************/
-/*
-heritance the read task
-create 4 heritance: read write flush trim
-implement the Executer function- function that will call read write etc
-impl static create function:
-should be like a distructor, if you have a member initialize it 
-create return my pointer like in factory test
-
-
-*/
 
 
 
@@ -226,14 +198,11 @@ std::shared_ptr<RETask> ReadTask::Create(const ReadWriteTask& args_)
     return task_ptr;
 }
 
-//do not implement the dtor
-/*ReadTask::~ReadTask()
-{}*/
 
 void ReadTask::Execute()
 {
     m_logger->Write( hrd29::Logger::Info,__FILE__, __LINE__, __func__, "executing READ request", true );
-    //call to storage->Read()
+    
     args_m.m_ram_storage->Read(args_m.m_driver_data);
     std::lock_guard<std::mutex> lock_reply(args_m.m_mutex_wrap->m_reply_mutex);
     SendDriverData(args_m.m_driver_communicator, args_m.m_driver_data, m_logger);
@@ -245,9 +214,7 @@ WriteTask::WriteTask(const ReadWriteTask& args_, Priority priority_):
 RETask(priority_), args_m(args_),m_logger(Singleton<Logger>::GetInstance())
 {}
 
-//no ned to implement the dtor- default
-/*WriteTask::~WriteTask()
-{}*/
+
 
 void WriteTask::Execute()
 {
@@ -339,7 +306,7 @@ void StdinTask::Execute()
     m_logger->Write( hrd29::Logger::Debug,__FILE__, __LINE__, __func__, "executing FLUSH request", true);
     if(true == StdinQuit(m_logger))
     {  
-        exit(EXIT_SUCCESS); // TODO: Gracefully ???
+        exit(EXIT_SUCCESS); 
     }
     m_logger->Write( hrd29::Logger::Debug,__FILE__, __LINE__, __func__, "executing FLUSH request", true);
 

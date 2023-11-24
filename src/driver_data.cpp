@@ -5,11 +5,10 @@ namespace hrd29
 {
     
     
-    DriverData::DriverData(size_t len_) : m_len(len_), m_buffer(len_)// I DO HAVE CONSTRUCTOR!
-    {
-    }
+    DriverData::DriverData(size_t len_) : m_len(len_), m_buffer(len_)
+    {}
 
-    DriverData::~DriverData() /* TODO - why is needed? why not =default*/
+    DriverData::~DriverData() 
     {}
 }
 

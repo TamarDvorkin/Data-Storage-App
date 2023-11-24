@@ -32,19 +32,19 @@ namespace hrd29
 
         }
 
-        fd = inotify_init1(IN_NONBLOCK);// man notify_init1/notify_init- IN_NONBLOCK, block only in thread, now only setup
+        fd = inotify_init1(IN_NONBLOCK);
         if(-1 == fd)
         {
-            //handle error- log an error or throw- do both- use MyException.hpp
+            
             logger1->Write( hrd29::Logger::Error,__FILE__, __LINE__, __func__, "pnp DirMonitor- Failed inotify_init1", true );
         }
         //wd add to watch
-        wd = inotify_add_watch(fd, dir_path_.c_str(),IN_ALL_EVENTS);// not IN_MOVED_TO// IN_CREATE
+        wd = inotify_add_watch(fd, dir_path_.c_str(),IN_ALL_EVENTS);
         
         
         if(-1 == wd)
         {
-            //handle error- log an error or throw- do both- use MyException.hpp
+            
             logger1->Write( hrd29::Logger::Error,__FILE__, __LINE__, __func__, "pnp DirMonitor- Failed inotify_add_watch", true );
         }
 
@@ -78,7 +78,7 @@ namespace hrd29
     {
         char buffer[4096]; //4096- common page size- store events
         __attribute__((aligned(__alignof__(struct inotify_event))));
-        struct inotify_event* in_event;//inotify event  //event
+        struct inotify_event* in_event; 
         int max_events = 2;
         struct epoll_event events[2];
         ssize_t len = 0;
@@ -94,7 +94,7 @@ namespace hrd29
         //create epoll instance
         if(-1 == epoll_fd)
         {
-            //log an error or throw
+            
             logger1->Write( hrd29::Logger::Error,__FILE__, __LINE__, __func__, "pnp DirMonitor- Failed epoll_create", true );
 
             return;
@@ -113,20 +113,18 @@ namespace hrd29
 
         while(listen)
         {
-            // should i use epoll? yes
-            // i need the TIMEOUT of EPOLL for stopping thread function(stop read)
-            // the distractor would chnage the flag to false
+           
+            // using epoll for timeout for stopping thread function(stop read)
+            // the distractor would chanage the flag to false
             // and the when calliung again the thread function the thread
             // will not get into the loop(flag is false)
-            //see here: https://man7.org/linux/man-pages/man7/inotify.7.html
-            //look for Examples
-
+         
         
             event_count = epoll_wait(epoll_fd, events,max_events, -1);
             //wait for max 2 event, -1 means- untill some event happends
             if(-1 == event_count)
             {
-                //log error or throw
+               
                 logger1->Write( hrd29::Logger::Error,__FILE__, __LINE__, __func__, "pnp DirMonitor- Failed epoll_wait", true);
 
                 break;
@@ -137,7 +135,7 @@ namespace hrd29
                 triggered_fd = events[i].data.fd;
                 if(triggered_fd == event_fd)
                 {
-                    //handle a non blocking wake up event
+                    
                     logger1->Write( hrd29::Logger::Error,__FILE__, __LINE__, __func__, "pnp DirMonitor- Failed triggered_fd", true);
 
                     return;
@@ -149,7 +147,7 @@ namespace hrd29
                     len = read(this->fd, buffer, sizeof(buffer));
                     if(len<0)
                     {
-                        //log error counld not read notify event 
+                         
                         logger1->Write( hrd29::Logger::Error,__FILE__, __LINE__, __func__, "pnp DirMonitor- Failed read", true);
 
                     }
@@ -157,36 +155,7 @@ namespace hrd29
                     while(j<len)
                     {
                         in_event = reinterpret_cast<struct inotify_event*>(&buffer[j]);
-                        // switch (in_event->mask)
-                        // {
-                        // case IN_MOVED_TO:
-                        //     std::cout <<"IN_MOVED_TO"<< std::endl;
-                        //     break;
-
-                        // case IN_MODIFY:
-                        //     std::cout <<"IN_MODIFY"<< std::endl;
-                        //     break;
-
-                        // case IN_MOVE:
-                        //     std::cout <<"IN_MOVE"<< std::endl;
-                        //     break;
-
-                        // case IN_OPEN:
-                        //     std::cout <<"IN_OPEN"<< std::endl;
-                        //     break;
-
-                        // case IN_ACCESS:
-                        //     std::cout <<"IN_ACCESS"<< std::endl;
-                        //     break;
-
-                        // default:
-                        //     std::cout <<"in_event->mask: "<< in_event->mask << std::endl;
-                        // }
-
-
-
-
-                        if(in_event->mask == IN_MOVED_TO || in_event->mask == IN_MODIFY)//IN_CREATE
+                        if(in_event->mask == IN_MOVED_TO || in_event->mask == IN_MODIFY)
                         {
                             std::cout <<"in mask even"<< std::endl;
                             std::string path_to_so = m_dir_path + "/" + in_event->name;
@@ -222,8 +191,6 @@ DllLoader::~DllLoader()
         dir_to_handle = dir_pair.second;
         if(dir_to_handle != nullptr)
         {
-            //dlclose(dir_to_handle);
-            // should check dlclose
             if(0!= dlclose(dir_to_handle))
             {
                 logger2->Write( hrd29::Logger::Error,__FILE__, __LINE__, __func__, "pnp DllLoader- Failed dlclose", true);
@@ -241,10 +208,9 @@ void DllLoader::LoadPlugin(const std::string& path_to_so_)
     dir_to_handle= dlopen(path_to_so_.c_str(), RTLD_NOW | RTLD_GLOBAL);
     if(nullptr == dir_to_handle)
     {
-         //log error counld not read\no events to read
+         
         logger2->Write( hrd29::Logger::Error,__FILE__, __LINE__, __func__, "pnp DllLoader- Failed dlopen", true);
         std::cerr << dlerror() << std::endl;
-        //logger
 
         exit(EXIT_FAILURE);
     }
@@ -259,7 +225,27 @@ void DllLoader::LoadPlugin(const std::string& path_to_so_)
 
 
 
-//how to create so file:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//how to create s.o (shared object) file:
 //gd11+ -shared -fpic test/pnp_so_file.cpp -o plg.so
 
 //how to run this program

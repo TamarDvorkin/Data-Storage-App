@@ -1,11 +1,4 @@
 
-/*******************************************************************************
- * Author:          hrd29
- * Description:     Header file for Publisher-Subscriber template
- * Date:            21.08.23
- * Reviewer:        ---
- * Versions:        1.0 
-*******************************************************************************/
 
 #ifndef _HRD29_EVENT_CHANNEL_HPP_
 #define _HRD29_EVENT_CHANNEL_HPP_
@@ -55,9 +48,7 @@ private:
     friend class Dispatcher<MSG>;
     virtual void Notify(const MSG& msg_) = 0;
     virtual void OutOfService() = 0;
-    //void Register();// do not implement- remove
-    //void UnRegister();// do not implement- remove
-
+ 
     Dispatcher<MSG>* m_dispatcher;
 };
 
@@ -77,7 +68,7 @@ public:
 
 private:
     void Notify(const MSG& msg_) override;
-    void OutOfService() override;//not mandatory
+    void OutOfService() override;
 
     OBS& m_obj;
     ActionMethod m_act;
@@ -88,9 +79,7 @@ private:
 template <typename MSG>
 Dispatcher<MSG>:: ~Dispatcher() noexcept
 {
-    //ICallback<MSG>::OutOfService();
-
-
+    
     try
     {
         for (auto it = m_callbacks.begin() ; it != m_callbacks.end(); ++it) 
@@ -120,18 +109,13 @@ void Dispatcher<MSG>:: NotifyAll(const MSG& msg_)
 template <typename MSG>
 void Dispatcher<MSG>::Register(ICallback<MSG>* callback_)
 {
-    //TODO:if callback_ == nullptr
-    //throw std::runtime error
     m_callbacks.push_back(callback_);
 }
 
 template <typename MSG>
 void Dispatcher<MSG>::UnRegister(ICallback<MSG>* callback_)
 {
-    //TODO:if callback_ == nullptr
-    //throw std::runtime error
 
-    // i loooove auto- cpp finds out the type, i do not mention it
     auto it =  std::find(m_callbacks.begin(), m_callbacks.end(), callback_);
     
     if(it!= m_callbacks.end())
@@ -146,15 +130,13 @@ void Dispatcher<MSG>::UnRegister(ICallback<MSG>* callback_)
 template <typename MSG>
 ICallback<MSG>::ICallback(Dispatcher<MSG>* disp_):m_dispatcher(disp_)
 {
-    //Dispatcher<MSG>::Register(m_dispatcher);
+ 
     m_dispatcher->Register(this);
-
 }
 
 template <typename MSG>
-ICallback<MSG>:: ~ICallback() noexcept // TODO: add try catch in distractors
+ICallback<MSG>:: ~ICallback() noexcept 
 {
-    //Dispatcher<MSG>::Unregister(m_dispatcher);
     try
     {
         if(nullptr !=m_dispatcher)
@@ -171,22 +153,17 @@ ICallback<MSG>:: ~ICallback() noexcept // TODO: add try catch in distractors
 
 
 /*************************impl of Callback**********************/
+
 template <typename MSG, typename OBS>
 Callback<MSG, OBS>::Callback(Dispatcher<MSG>* disp_, OBS& obj_,ActionMethod act_, StopMethod stp_ ):
 ICallback<MSG>(disp_), m_obj(obj_),m_act(act_), m_stop(stp_)
-{
-    //disp_ - is THIS! you do this by implement with ICall(disp)
-    //empty
-
-}
+{}
 
 
 
 template <typename MSG, typename OBS>
 Callback<MSG, OBS>::~Callback()
-{
-    //empty 
-}
+{}
 
 template <typename MSG, typename OBS>
 void Callback<MSG, OBS>::Notify(const MSG& msg_)
@@ -200,7 +177,7 @@ void Callback<MSG, OBS>::OutOfService()
     std::cout<<"in OutOfService"<<std::endl;
     if(nullptr!=m_stop)
     {
-        //m_stop();
+        
         (m_obj.*m_stop)();
     }
 

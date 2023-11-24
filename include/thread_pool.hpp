@@ -1,10 +1,4 @@
-/*******************************************************************************
- * Author: Tamar
- * Description: Header file for thread pool
- * Date: 017.08.2023
- * Reviewer: ---
- * Versions: 1.0 
-*******************************************************************************/
+
 #ifndef _HRD29_THREAD_POOL_HPP_
 #define _HRD29_THREAD_POOL_HPP_
 
@@ -14,7 +8,7 @@
 #include <algorithm>
 #include <mutex>
 #include <condition_variable>
-#include <future>   // std::promise, std::future
+#include <future> 
 
 #include "singleton.hpp"
 #include "interface_thread_task.hpp"
@@ -23,7 +17,7 @@
 
 namespace hrd29
 {
-    size_t CoresInCPU();// for constructor to build num of threads
+    size_t CoresInCPU();// for Ctor to build num of threads
     bool SharedPtrITaskLAST(std::shared_ptr<ITask> x, std::shared_ptr<ITask> y);
     
     
@@ -37,15 +31,12 @@ namespace hrd29
     };
 
 
-
-
 class ThreadPool
 {
 public:
 
-    explicit ThreadPool(size_t thread_num_ = CoresInCPU());
-    //std::max - move to function.
-    //If hardware_concurrency() returns 0, the number of thread will be 1
+    explicit ThreadPool(size_t thread_num_ = CoresInCPU());//If hardware_concurrency() returns 0, the number of thread will be 1
+    
     ~ThreadPool();
     ThreadPool(const ThreadPool&) = delete;
     ThreadPool& operator=(const ThreadPool&) = delete;
@@ -73,7 +64,7 @@ private:
  
     std::mutex m_mutex;
     std::condition_variable m_cv;
-    std::condition_variable m_suspend_cv;//new check- second cv for execute TPTASk
+    std::condition_variable m_suspend_cv;//second cv for execute TPTASk
     std::atomic_bool m_is_stop;
     bool m_is_suspend;
     size_t m_suspend_thread;

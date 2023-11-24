@@ -1,19 +1,6 @@
 
-/*******************************************************************************
- * Author:          HRD29
- * Description:     Header file for framework
- * Date:            22.08.23
- * Reviewer:        ---
- * Versions:        1.0 
-*******************************************************************************/
-//#pragma once
-
-
 #ifndef _HRD29_RequestEngineFW_
 #define _HRD29_RequestEngineFW_
-
-//#include <utility>//std::pair
-//#include <cstring>//strcmp
 
 #include "eventchannel.hpp"
 #include "logger.hpp"
@@ -22,13 +9,9 @@
 #include "interface_thread_task.hpp"//ITask
 #include "pnp.hpp"
 #include "RequestSource.hpp"
-#include "RETask.hpp"//maybe i need this
-//#include <sys/eventfd.h> //eventfd
+#include "RETask.hpp"
 #include <sys/epoll.h>  //epoll
 #include <cerrno>
-//#include <unistd.h>
-
-
 
 namespace hrd29
 {
@@ -49,16 +32,9 @@ public:
 
     void ConfigTask(const KEY& key, Create_Func func_);//facroty.add
     void ConfigRequestSource(std::shared_ptr<IRequestSource<KEY,ARGS>> request_source_);
-    void Run();//listen epoll
-    //if fd wake up
-    //go to hasu- find the key,args
-    //create factory
-    //TP.add (the specific execute)
-    //
-    //void Stop(); //TODO: why no stop function ?you can implement with flag
-
+    void Run();
+ 
 private:
-//watch-dog; todo at the end
     epoll_event* InitEpoll();
     void SetKAPair(const epoll_event& event, std::pair<KEY, ARGS>& key_args);
     void SetRETaskt(std::shared_ptr<RETask>& task_ptr, const std::pair<KEY, ARGS>& key_args);
@@ -68,10 +44,8 @@ private:
     DirMonitor m_dir_monitor;
     DllLoader m_plug_loader;
 
-    std::unordered_map<int, std::shared_ptr<IRequestSource<KEY,ARGS>>> m_request_sources_;// impl in test
+    std::unordered_map<int, std::shared_ptr<IRequestSource<KEY,ARGS>>> m_request_sources_;
     int epoll_fd_m ; //epoll fd file(m_epoll_fd)
-    //bool m_is_running;// should be atomic- do not use it but a global disc flag
-    //void ConfigStopTask();
     Logger* m_logger;
 };
 
@@ -87,9 +61,7 @@ m_dir_monitor(path_to_plugin_),
 m_plug_loader(m_dir_monitor.GetDispatcher()),
 m_logger(Singleton<Logger>::GetInstance())
 {
-    //m_logger->SetLogLevel(Logger::Error);// move to cpp
     m_logger->Write( hrd29::Logger::Debug,__FILE__, __LINE__, __func__, "RequestEngineFW - Enter", true );
-
 }
 
 catch(const std::bad_alloc& ex) // Factory
@@ -98,22 +70,6 @@ catch(const std::bad_alloc& ex) // Factory
     exit(EXIT_FAILURE);
 }
 
-
-/*OLD IMPL
-template< typename KEY, typename ARGS>
-RequestEngineFW<KEY, ARGS>::~RequestEngineFW() noexcept
-{
-    try
-    {
-        this->Stop();
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-    }
-    
-
-}*/
 
 template< typename KEY, typename ARGS>
 void RequestEngineFW<KEY, ARGS>::ConfigTask(const KEY& key, Create_Func func_)
@@ -170,9 +126,7 @@ void RequestEngineFW<KEY, ARGS>::Run()
 
         for(int i = 0; i < num_fds; ++i)
         {
-            /*std::pair<KEY, ARGS> key_args =m_request_sources_.at(event[i].data.fd)->Read();
-            task_ptr = m_factory->Create(key_args.first, key_args.second);
-            */
+           
             SetKAPair(events_array[i], key_args);
             SetRETaskt(task_ptr, key_args);
             m_thread_pool.AddTask(task_ptr);
@@ -195,17 +149,6 @@ void RequestEngineFW<KEY, ARGS>::Run()
     
 }
 
-//TODO: NOT SURE THE STOP
-/*template< typename KEY, typename ARGS>
-void RequestEngineFW<KEY, ARGS>::Stop()
-{
-    
-    m_is_running = false;
-    //m_thread_pool.Stop();//no need the dtor of thread pool calls stop
-    close(epoll_fd_m); //create event to stop the epoll
-    
-}*/
-
 
 /************************Private Functions*************************/
 template<typename KEY, typename ARGS>
@@ -215,7 +158,6 @@ epoll_event* RequestEngineFW<KEY, ARGS>::InitEpoll()
 
     const size_t num_of_sources = m_request_sources_.size();
     epoll_event* events_array = new epoll_event[num_of_sources];
-    // 0 - nbd_event, 1 - stdin_event
     memset(events_array, 0, sizeof(epoll_event) * num_of_sources);
 
     epoll_fd_m= epoll_create1(EPOLL_CLOEXEC);
@@ -269,10 +211,30 @@ void RequestEngineFW<KEY, ARGS>::SetRETaskt(std::shared_ptr<RETask>& task_ptr, c
 }
 
 
-
 }
 
 #endif //_HRD29_RequestEngineFW_
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

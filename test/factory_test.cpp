@@ -11,9 +11,6 @@
 
 using namespace hrd29;
 
-
-// Assume you have a Base class and some derived classes
-
 class Base 
 {
 public:
@@ -48,20 +45,20 @@ public:
 // Define the creation functions for the derived classes
 std::shared_ptr<Base> CreateDerived1(int args) 
 {
-    return std::make_shared<Derived1>();//calling constructor with new
+    return std::make_shared<Derived1>();//calling Ctor with new
 }
 
 std::shared_ptr<Base> CreateDerived2(int args) 
 {
-    return std::make_shared<Derived2>();//calling constructor with new
+    return std::make_shared<Derived2>();//calling Ctor with new
 }
 
 
 int main()
 {
     //template<typename Base, typename Key, typename Args>
-    
     Factory<Base, std::string, int> *my_factory = Singleton<Factory<Base, std::string, int>>::GetInstance();
+    
     // Register the creation functions with keys
     my_factory->Add("Derived1", CreateDerived1);
     my_factory->Add("Derived2", CreateDerived2);

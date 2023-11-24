@@ -6,7 +6,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "logger.hpp"
-//#include "RETask.hpp"
 #include "drive_communicator.hpp"
 #include "driver_data.hpp"
 #include "storage.hpp"
@@ -27,36 +26,34 @@ class IRequestSource
 public:
     explicit IRequestSource()= default;
     virtual ~IRequestSource() noexcept =0;
-    //cctor and copy assignment : default
     IRequestSource(const IRequestSource& other_) = delete;
     IRequestSource& operator=(const IRequestSource& other_) = delete; 
 
-    virtual std::pair<KEY,ARGS>  Read() = 0; //test- data driver communicator
-    virtual int GetFd()=0;//test- data driver communicator
+    virtual std::pair<KEY,ARGS>  Read() = 0; 
+    virtual int GetFd()=0;
 
 private:
 
 };
 
 template< typename KEY, typename ARGS>
-class RequesKeyborad : public IRequestSource<KEY,ARGS>//ARGS = STD::SHARED_PTR<RETask>
+class RequesKeyborad : public IRequestSource<KEY,ARGS>
 {
-    //implement std::pair<KEY,ARGS>  Read()
-    //implement int GetFd()
+    
 public:
     explicit RequesKeyborad(ARGS& args_);
     std::pair<KEY, ARGS> Read() override;
     int GetFd() override;
 
 private:
-    //YourKeyEnum key_m;
+    
     ARGS args_m;
     Logger* m_logger;
 
 
 };
 
-//DeviceSource class
+
 template< typename KEY, typename ARGS>
 class NBDRequest : public IRequestSource<KEY,ARGS>//ARGS = STD::SHARED_PTR<RETask>
 {
@@ -78,14 +75,14 @@ private:
 };
 
 
-/*******************************IRequestSource IMP****************************/
+/**************************************************************IRequestSource IMP***************************************************************/
 
 template< typename KEY, typename ARGS>
 IRequestSource<KEY,ARGS>::~IRequestSource() noexcept
 {}
 
 
-/*******************************RequesKeyborad IMP****************************/
+/***************************************************************RequesKeyborad IMP************************************************************/
 
 template< typename KEY, typename ARGS>
 RequesKeyborad<KEY, ARGS>::RequesKeyborad(ARGS& args_):args_m(args_), m_logger(Singleton<Logger>::GetInstance())
@@ -108,7 +105,7 @@ int RequesKeyborad<KEY, ARGS> ::GetFd()
 }
 
 
-/*******************************NBDRequest IMP****************************/
+/********************************************************NBDRequest IMP*****************************************************************/
 
 template< typename KEY, typename ARGS>
 NBDRequest<KEY, ARGS>::NBDRequest(const ARGS& args_):args_m(args_), m_logger(Singleton<Logger>::GetInstance())
@@ -135,7 +132,7 @@ int NBDRequest<KEY, ARGS> ::GetFd()
 }
 
 
-/*****************8static func*/
+/**********************************************************static func************************************************************************/
 static void ReceiveDriverData
 (const std::shared_ptr<IDriverCommunicator>& driver_comm_ptr, std::shared_ptr<DriverData>& driver_data_ptr,
 Logger* logger)
@@ -157,7 +154,6 @@ Logger* logger)
 
 
 }
-
 
 
 

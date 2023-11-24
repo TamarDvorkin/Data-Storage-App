@@ -23,19 +23,5 @@ int main()
 	DllLoader loader(monitor.GetDispatcher());
 	std::this_thread::sleep_for(std::chrono::seconds(20));
 
-	// create listener for dispatcher
-	/*auto listerner = [](const std::string& path)
-	{
-		std::cout<< "recieve event: "<< path <<std::endl;
-		
-	}*/
-
-	/*while(1)
-	{
-		 std::this_thread::sleep_for(std::chrono::seconds(1));
-	}*/
-
-
-
 	return 0;
 }

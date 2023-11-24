@@ -1,11 +1,4 @@
 
-/*******************************************************************************
- * Author:          HRD29
- * Description:     Header file for Plug And Play
- * Date:            22.08.23
- * Reviewer:        ---
- * Versions:        1.0 
-*******************************************************************************/
 
 #ifndef _HRD29_PLUG_AND_PLAY_HPP_
 #define _HRD29_PLUG_AND_PLAY_HPP_
